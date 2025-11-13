@@ -79,28 +79,6 @@ piex.github.io/
 └── README.md              # Este arquivo
 ```
 
-## 🚀 Como Usar
-
-### Visualização Local
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/felipejs8/piex.github.io.git
-cd piex.github.io
-```
-
-2. Abra `index.html` em seu navegador preferido
-
-### Deploy no GitHub Pages
-
-Este repositório está configurado para GitHub Pages. Para visualizar online:
-
-1. Acesse as configurações do repositório no GitHub
-2. Vá para **Settings > Pages**
-3. Em **Source**, selecione a branch `main` (ou `master`) e pasta `/ (root)`
-4. Clique em **Save**
-5. O site estará disponível em: `https://felipejs8.github.io/piex.github.io/`
-
 ## 📚 Referências Principais
 
 - [ONU - Objetivos de Desenvolvimento Sustentável](https://sdgs.un.org/goals/goal9)
@@ -113,13 +91,9 @@ Este repositório está configurado para GitHub Pages. Para visualizar online:
 
 Este é um projeto educacional desenvolvido para fins acadêmicos. Sugestões e feedback são bem-vindos!
 
-## 📄 Licença
-
-Este projeto foi desenvolvido como trabalho acadêmico para o curso de Ciência de Dados e Inteligência Artificial.
-
 ## 👨‍💻 Autor
 
-Desenvolvido como parte do Projeto de Extensão (PIEX II)
+Desenvolvido por felipejs8 como parte do Projeto de Extensão (PIEX II)
 
 ---
 
