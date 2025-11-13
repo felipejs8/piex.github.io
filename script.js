@@ -81,17 +81,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Contador animado para números
-function animateCounter(element, target, duration = 2000) {
+function animateCounter(element, target, suffix = '', duration = 2000) {
     let start = 0;
     const increment = target / (duration / 16); // 60fps
     
     const timer = setInterval(() => {
         start += increment;
         if (start >= target) {
-            element.textContent = Math.round(target);
+            element.textContent = Math.round(target) + suffix;
             clearInterval(timer);
         } else {
-            element.textContent = Math.round(start);
+            element.textContent = Math.round(start) + suffix;
         }
     }, 16);
 }
@@ -103,12 +103,33 @@ const resultObserver = new IntersectionObserver(function(entries) {
             const numberElement = entry.target.querySelector('.result-number, .metric-value');
             if (numberElement) {
                 const text = numberElement.textContent;
-                const number = parseFloat(text.replace(/[^0-9.]/g, ''));
                 
-                if (!isNaN(number)) {
-                    numberElement.textContent = '0';
-                    animateCounter(numberElement, number);
+                // Detectar se é um intervalo (ex: 20-30%, 20%-30%)
+                const isRange = text.match(/(\d+)\s*[-–—]\s*(\d+)/);
+                
+                if (isRange) {
+                    // Se é intervalo, não animar - apenas marcar como animado
+                    // para evitar múltiplas tentativas
                     entry.target.dataset.animated = 'true';
+                } else {
+                    // Número simples - animar normalmente
+                    const number = parseFloat(text.replace(/[^0-9.]/g, ''));
+                    
+                    // Detectar sufixo (%, t, kg, etc.)
+                    let suffix = '';
+                    if (text.includes('%')) {
+                        suffix = '%';
+                    } else if (text.toLowerCase().includes('t')) {
+                        suffix = 't';
+                    } else if (text.toLowerCase().includes('kg')) {
+                        suffix = 'kg';
+                    }
+                    
+                    if (!isNaN(number)) {
+                        numberElement.textContent = '0' + suffix;
+                        animateCounter(numberElement, number, suffix);
+                        entry.target.dataset.animated = 'true';
+                    }
                 }
             }
         }

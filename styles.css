@@ -743,6 +743,19 @@ body {
     font-style: italic;
 }
 
+.source a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    border-bottom: 1px dotted var(--secondary-color);
+}
+
+.source a:hover {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
 /* ===============================================
    PILARES
    =============================================== */
@@ -1122,11 +1135,22 @@ body {
     box-shadow: var(--shadow-md);
 }
 
+.example-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(52, 152, 219, 0.1);
+    border-left: 3px solid var(--secondary-color);
+    border-radius: 4px;
+}
+
 .example-box {
     background: var(--bg-light);
     border-radius: 8px;
     padding: 2rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 
 .example-box h4 {
@@ -1163,6 +1187,20 @@ body {
     opacity: 0.8;
     margin-top: 0.5rem;
     display: block;
+}
+
+.metric-source a {
+    color: white;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+    transition: var(--transition);
+}
+
+.metric-source a:hover {
+    opacity: 1;
+    text-decoration-style: solid;
+    text-decoration-thickness: 2px;
 }
 
 .ods-connection {
