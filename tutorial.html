@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tutorial Técnico - Aprenda a analisar dados BIM com Python">
+    <title>Tutorial Técnico | Construção 4.0</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+    <!-- Navegação -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>Construção 4.0</h1>
+                <span class="subtitle">BIM + IA + ODS</span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="ods94.html">ODS 9.4</a></li>
+                <li><a href="eficiencia.html">Eficiência</a></li>
+                <li><a href="sustentabilidade.html">Sustentabilidade</a></li>
+                <li><a href="tutorial.html" class="active">Tutorial</a></li>
+            </ul>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header da Página -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Tutorial Técnico</h1>
+            <p>Primeiros passos para analisar dados de modelos BIM com Python</p>
+        </div>
+    </section>
+
+    <!-- Introdução -->
+    <section class="content-section">
+        <div class="container">
+            <div class="intro-box">
+                <h2>Ciência de Dados aplicada a BIM</h2>
+                <p>Este tutorial demonstra como um Cientista de Dados pode extrair, processar e analisar informações de modelos BIM para gerar insights sobre eficiência de recursos e sustentabilidade.</p>
+                <p>Usaremos Python e a biblioteca <strong>IfcOpenShell</strong> para ler arquivos IFC (Industry Foundation Classes), o formato padrão aberto de BIM.</p>
+                
+                <div class="prereq-box">
+                    <h3>Pré-requisitos</h3>
+                    <ul>
+                        <li>Python 3.8+ instalado</li>
+                        <li>Conhecimento básico de Python e Pandas</li>
+                        <li>Ambiente virtual (recomendado)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parte 1: Setup -->
+    <section class="tutorial-section">
+        <div class="container">
+            <div class="tutorial-step">
+                <div class="step-header">
+                    <span class="step-badge">Passo 1</span>
+                    <h2>Configuração do Ambiente</h2>
+                </div>
+
+                <div class="step-content">
+                    <p>Primeiro, vamos instalar as bibliotecas necessárias:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Terminal / PowerShell</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-bash"># Criar ambiente virtual (opcional, mas recomendado)
+python -m venv venv
+.\venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# Instalar bibliotecas
+pip install ifcopenshell pandas matplotlib numpy</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>💡 O que é IFC?</strong>
+                        <p>IFC (Industry Foundation Classes) é um formato de arquivo aberto usado para compartilhar modelos BIM entre diferentes softwares (Revit, ArchiCAD, Tekla, etc.). É o padrão ISO 16739.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parte 2: Lendo o modelo -->
+    <section class="tutorial-section alternate">
+        <div class="container">
+            <div class="tutorial-step">
+                <div class="step-header">
+                    <span class="step-badge">Passo 2</span>
+                    <h2>Lendo um Modelo BIM (IFC)</h2>
+                </div>
+
+                <div class="step-content">
+                    <p>Vamos criar um script Python para abrir e explorar um arquivo IFC:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>analise_bim.py</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-python">import ifcopenshell
+import pandas as pd
+
+# Abrir o arquivo IFC
+# Substitua pelo caminho do seu arquivo
+modelo = ifcopenshell.open('caminho/para/seu_modelo.ifc')
+
+# Informações básicas do modelo
+print("=== Informações do Modelo ===")
+print(f"Schema: {modelo.schema}")
+print(f"Número de entidades: {len(list(modelo))}")
+
+# Obter informações do projeto
+projeto = modelo.by_type('IfcProject')[0]
+print(f"Nome do Projeto: {projeto.Name}")
+print(f"Descrição: {projeto.Description}")
+
+# Listar todos os tipos de elementos presentes
+tipos_elementos = set()
+for elemento in modelo:
+    tipos_elementos.add(elemento.is_a())
+
+print(f"\nTipos de elementos no modelo: {len(tipos_elementos)}")
+print("Primeiros 10 tipos:", list(tipos_elementos)[:10])</code></pre>
+                    </div>
+
+                    <div class="output-box">
+                        <strong>📤 Saída Esperada:</strong>
+                        <pre>
+=== Informações do Modelo ===
+Schema: IFC4
+Número de entidades: 15847
+Nome do Projeto: Edifício Residencial Alto Padrão
+Descrição: Torre com 25 pavimentos
+
+Tipos de elementos no modelo: 87
+Primeiros 10 tipos: ['IfcWall', 'IfcSlab', 'IfcBeam', 'IfcColumn', ...]
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parte 3: Extraindo Quantitativos -->
+    <section class="tutorial-section">
+        <div class="container">
+            <div class="tutorial-step">
+                <div class="step-header">
+                    <span class="step-badge">Passo 3</span>
+                    <h2>Extraindo Quantitativos de Materiais</h2>
+                </div>
+
+                <div class="step-content">
+                    <p>Agora vamos extrair quantidades de materiais (volumes de concreto, áreas de parede, etc.):</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>quantitativos.py</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-python">import ifcopenshell
+import ifcopenshell.util.element as Element
+import pandas as pd
+
+def extrair_quantitativos(modelo, tipo_elemento):
+    """
+    Extrai quantitativos de um tipo específico de elemento.
+    
+    Args:
+        modelo: Objeto IfcOpenShell do modelo
+        tipo_elemento: String, ex: 'IfcWall', 'IfcSlab', 'IfcBeam'
+    
+    Returns:
+        DataFrame com os quantitativos
+    """
+    elementos = modelo.by_type(tipo_elemento)
+    dados = []
+    
+    for elem in elementos:
+        # Obter propriedades básicas
+        info = {
+            'ID': elem.GlobalId,
+            'Nome': elem.Name if hasattr(elem, 'Name') else 'N/A',
+            'Tipo': tipo_elemento
+        }
+        
+        # Tentar obter quantidades (volume, área, etc.)
+        for definition in elem.IsDefinedBy:
+            if definition.is_a('IfcRelDefinesByProperties'):
+                property_set = definition.RelatingPropertyDefinition
+                
+                if property_set.is_a('IfcElementQuantity'):
+                    for quantity in property_set.Quantities:
+                        # Volume
+                        if quantity.is_a('IfcQuantityVolume'):
+                            info['Volume_m3'] = quantity.VolumeValue
+                        # Área
+                        elif quantity.is_a('IfcQuantityArea'):
+                            info['Area_m2'] = quantity.AreaValue
+                        # Comprimento
+                        elif quantity.is_a('IfcQuantityLength'):
+                            info['Comprimento_m'] = quantity.LengthValue
+        
+        dados.append(info)
+    
+    return pd.DataFrame(dados)
+
+# Usar a função
+modelo = ifcopenshell.open('caminho/para/seu_modelo.ifc')
+
+# Extrair quantitativos de lajes (concreto)
+lajes = extrair_quantitativos(modelo, 'IfcSlab')
+print("=== Quantitativos de Lajes ===")
+print(f"Total de lajes: {len(lajes)}")
+
+if 'Volume_m3' in lajes.columns:
+    volume_total = lajes['Volume_m3'].sum()
+    print(f"Volume total de concreto (lajes): {volume_total:.2f} m³")
+    print(f"Massa estimada (2.400 kg/m³): {volume_total * 2400:.0f} kg")
+
+# Extrair quantitativos de paredes
+paredes = extrair_quantitativos(modelo, 'IfcWall')
+print("\n=== Quantitativos de Paredes ===")
+print(f"Total de paredes: {len(paredes)}")
+
+if 'Area_m2' in paredes.columns:
+    area_total = paredes['Area_m2'].sum()
+    print(f"Área total de paredes: {area_total:.2f} m²")
+
+# Salvar em CSV para análise posterior
+lajes.to_csv('quantitativos_lajes.csv', index=False)
+paredes.to_csv('quantitativos_paredes.csv', index=False)
+print("\nArquivos CSV salvos com sucesso!")</code></pre>
+                    </div>
+
+                    <div class="info-box success">
+                        <strong>✅ Conexão com Meta 9.4</strong>
+                        <p>Esta quantificação precisa é a base da "eficiência aumentada no uso de recursos". Saber exatamente quanto material você precisa evita desperdício e custos desnecessários.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parte 4: Calculando Pegada de Carbono -->
+    <section class="tutorial-section alternate">
+        <div class="container">
+            <div class="tutorial-step">
+                <div class="step-header">
+                    <span class="step-badge">Passo 4</span>
+                    <h2>Calculando Pegada de Carbono</h2>
+                </div>
+
+                <div class="step-content">
+                    <p>Vamos calcular o carbono incorporado nos materiais do modelo:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>pegada_carbono.py</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+
+# Fatores de emissão (kg CO2 por unidade)
+# Fonte: ICE Database (Inventory of Carbon & Energy)
+FATORES_CARBONO = {
+    'concreto_c30': 350,      # kg CO2 por m³
+    'concreto_c40': 400,      # kg CO2 por m³
+    'aco': 2100,              # kg CO2 por tonelada
+    'tijolo_ceramico': 0.24,  # kg CO2 por unidade
+    'vidro': 850,             # kg CO2 por tonelada
+    'aluminio': 8500,         # kg CO2 por tonelada
+}
+
+def calcular_carbono_concreto(volume_m3, tipo='concreto_c30'):
+    """
+    Calcula carbono incorporado em elementos de concreto.
+    
+    Args:
+        volume_m3: Volume em metros cúbicos
+        tipo: Tipo de concreto (concreto_c30 ou concreto_c40)
+    
+    Returns:
+        Carbono em kg CO2
+    """
+    fator = FATORES_CARBONO.get(tipo, 350)
+    carbono = volume_m3 * fator
+    return carbono
+
+def gerar_relatorio_carbono(modelo_path):
+    """
+    Gera relatório completo de carbono incorporado.
+    """
+    # Carregar os quantitativos (do Passo 3)
+    lajes = pd.read_csv('quantitativos_lajes.csv')
+    
+    # Calcular carbono
+    if 'Volume_m3' in lajes.columns:
+        volume_total = lajes['Volume_m3'].sum()
+        carbono_lajes = calcular_carbono_concreto(volume_total, 'concreto_c30')
+        
+        print("=== Relatório de Pegada de Carbono ===")
+        print(f"Volume de concreto (lajes): {volume_total:.2f} m³")
+        print(f"Carbono incorporado: {carbono_lajes:,.0f} kg CO2")
+        print(f"Equivalente a: {carbono_lajes/1000:.2f} toneladas CO2")
+        
+        # Contexto: equivalências
+        arvores_necessarias = carbono_lajes / 22  # 1 árvore absorve ~22kg CO2/ano
+        print(f"\nContexto:")
+        print(f"  - Equivalente a {arvores_necessarias:,.0f} árvores durante 1 ano")
+        print(f"  - Equivalente a {carbono_lajes/120:,.0f} carros durante 1 mês")
+        
+        # Simular alternativa sustentável
+        print("\n=== Alternativa Sustentável ===")
+        print("Se substituirmos por concreto com 30% de escória:")
+        carbono_alternativo = volume_total * (350 * 0.7)  # 30% menos carbono
+        reducao = carbono_lajes - carbono_alternativo
+        print(f"Carbono incorporado: {carbono_alternativo:,.0f} kg CO2")
+        print(f"Redução: {reducao:,.0f} kg CO2 ({reducao/carbono_lajes*100:.1f}%)")
+        
+        return {
+            'volume': volume_total,
+            'carbono_tradicional': carbono_lajes,
+            'carbono_sustentavel': carbono_alternativo,
+            'reducao': reducao
+        }
+
+# Executar análise
+resultado = gerar_relatorio_carbono('modelo.ifc')
+
+# Visualizar comparação
+fig, ax = plt.subplots(figsize=(10, 6))
+categorias = ['Concreto\nTradicional', 'Concreto com\nEscória (30%)']
+valores = [resultado['carbono_tradicional']/1000, 
+           resultado['carbono_sustentavel']/1000]
+
+bars = ax.bar(categorias, valores, color=['#e74c3c', '#27ae60'])
+ax.set_ylabel('Carbono Incorporado (toneladas CO2)', fontsize=12)
+ax.set_title('Comparação de Pegada de Carbono - Meta 9.4', fontsize=14, fontweight='bold')
+
+# Adicionar valores nas barras
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{height:.1f}t CO2',
+            ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+# Adicionar linha de redução
+reducao_percentual = (resultado['reducao'] / resultado['carbono_tradicional']) * 100
+ax.text(0.5, max(valores) * 0.9, 
+        f'Redução: {reducao_percentual:.1f}%',
+        ha='center', fontsize=13, color='green', fontweight='bold',
+        bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
+
+plt.tight_layout()
+plt.savefig('comparacao_carbono.png', dpi=300)
+print("\nGráfico salvo como 'comparacao_carbono.png'")</code></pre>
+                    </div>
+
+                    <div class="output-box">
+                        <strong>📤 Saída Esperada:</strong>
+                        <pre>
+=== Relatório de Pegada de Carbono ===
+Volume de concreto (lajes): 856.45 m³
+Carbono incorporado: 299,758 kg CO2
+Equivalente a: 299.76 toneladas CO2
+
+Contexto:
+  - Equivalente a 13,625 árvores durante 1 ano
+  - Equivalente a 2,498 carros durante 1 mês
+
+=== Alternativa Sustentável ===
+Se substituirmos por concreto com 30% de escória:
+Carbono incorporado: 209,830 kg CO2
+Redução: 89,928 kg CO2 (30.0%)
+
+Gráfico salvo como 'comparacao_carbono.png'
+                        </pre>
+                    </div>
+
+                    <div class="info-box success">
+                        <strong>🌱 Impacto na Meta 9.4</strong>
+                        <p>Este tipo de análise permite decisões baseadas em dados sobre "tecnologias limpas e ambientalmente corretas". A IA pode automatizar essas comparações para centenas de alternativas de materiais.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parte 5: Machine Learning Básico -->
+    <section class="tutorial-section">
+        <div class="container">
+            <div class="tutorial-step">
+                <div class="step-header">
+                    <span class="step-badge">Passo 5</span>
+                    <h2>Aplicando Machine Learning (Previsão)</h2>
+                </div>
+
+                <div class="step-content">
+                    <p>Exemplo de como usar ML para prever custos ou resíduos baseado em características do projeto:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>ml_previsao.py</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+
+# Exemplo: Dados históricos de projetos (simulados)
+# Em um cenário real, estes viriam de projetos anteriores
+dados_historicos = pd.DataFrame({
+    'area_construida_m2': [5000, 8000, 12000, 6500, 15000, 9000, 7500, 11000],
+    'numero_pavimentos': [10, 15, 25, 12, 30, 18, 14, 22],
+    'volume_concreto_m3': [2500, 4200, 7000, 3400, 9000, 5000, 3900, 6500],
+    'tipo_padrao': [1, 1, 2, 1, 2, 2, 1, 2],  # 1=médio, 2=alto
+    'desperdicio_percentual': [8.5, 7.2, 5.1, 9.0, 4.8, 6.0, 7.8, 5.5]  # % de resíduo
+})
+
+# Features (características) e Target (alvo)
+X = dados_historicos[['area_construida_m2', 'numero_pavimentos', 
+                       'volume_concreto_m3', 'tipo_padrao']]
+y = dados_historicos['desperdicio_percentual']
+
+# Dividir em treino e teste
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# Treinar modelo
+modelo_rf = RandomForestRegressor(n_estimators=100, random_state=42)
+modelo_rf.fit(X_train, y_train)
+
+# Avaliar
+y_pred = modelo_rf.predict(X_test)
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("=== Modelo de Previsão de Desperdício ===")
+print(f"MAE (Mean Absolute Error): {mae:.2f}%")
+print(f"R² Score: {r2:.3f}")
+
+# Fazer previsão para um novo projeto
+novo_projeto = pd.DataFrame({
+    'area_construida_m2': [10000],
+    'numero_pavimentos': [20],
+    'volume_concreto_m3': [5500],
+    'tipo_padrao': [2]  # Alto padrão
+})
+
+desperdicio_previsto = modelo_rf.predict(novo_projeto)[0]
+print(f"\n=== Previsão para Novo Projeto ===")
+print(f"Área: 10.000 m² | Pavimentos: 20 | Tipo: Alto Padrão")
+print(f"Desperdício previsto: {desperdicio_previsto:.2f}%")
+
+# Calcular impacto
+volume_residuo = (novo_projeto['volume_concreto_m3'][0] * desperdicio_previsto / 100)
+custo_residuo = volume_residuo * 500  # R$ 500/m³ (custo aproximado)
+
+print(f"\nImpacto estimado:")
+print(f"  - Volume de resíduo: {volume_residuo:.2f} m³")
+print(f"  - Custo do desperdício: R$ {custo_residuo:,.2f}")
+print(f"  - Carbono desperdiçado: {volume_residuo * 350:.0f} kg CO2")
+
+# Sugestão de melhoria
+print(f"\n💡 Recomendação:")
+print(f"Com uso de BIM+IA (clash detection), o desperdício pode ser reduzido para ~3%")
+desperdicio_otimizado = 3.0
+volume_residuo_otimizado = (novo_projeto['volume_concreto_m3'][0] * desperdicio_otimizado / 100)
+economia = custo_residuo - (volume_residuo_otimizado * 500)
+print(f"Economia potencial: R$ {economia:,.2f}")
+print(f"Redução de carbono: {(volume_residuo - volume_residuo_otimizado) * 350:.0f} kg CO2")</code></pre>
+                    </div>
+
+                    <div class="output-box">
+                        <strong>📤 Saída Esperada:</strong>
+                        <pre>
+=== Modelo de Previsão de Desperdício ===
+MAE (Mean Absolute Error): 0.85%
+R² Score: 0.892
+
+=== Previsão para Novo Projeto ===
+Área: 10.000 m² | Pavimentos: 20 | Tipo: Alto Padrão
+Desperdício previsto: 5.67%
+
+Impacto estimado:
+  - Volume de resíduo: 311.85 m³
+  - Custo do desperdício: R$ 155,925.00
+  - Carbono desperdiçado: 109,148 kg CO2
+
+💡 Recomendação:
+Com uso de BIM+IA (clash detection), o desperdício pode ser reduzido para ~3%
+Economia potencial: R$ 73,425.00
+Redução de carbono: 46,648 kg CO2
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Próximos Passos -->
+    <section class="next-steps">
+        <div class="container">
+            <h2>Próximos Passos</h2>
+            <p>Este tutorial cobriu os fundamentos. Para aprofundar seus conhecimentos em BIM + IA, explore:</p>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <h3>📚 Aprendizado Adicional</h3>
+                    <ul>
+                        <li><a href="https://blenderbim.org/docs-python/index.html" target="_blank">Documentação IfcOpenShell</a></li>
+                        <li><a href="https://www.buildingsmart.org/standards/bsi-standards/industry-foundation-classes/" target="_blank">Especificação IFC - buildingSMART</a></li>
+                        <li><a href="https://academy.ifcopenshell.org/" target="_blank">IfcOpenShell Academy</a></li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3>🔧 Ferramentas Avançadas</h3>
+                    <ul>
+                        <li><strong>Speckle:</strong> Plataforma de dados BIM aberta</li>
+                        <li><strong>Autodesk Platform Services (APS):</strong> APIs para Revit</li>
+                        <li><strong>Rhino.Inside:</strong> Integração Grasshopper + Python</li>
+                        <li><strong>PyRevit:</strong> Extensões Python para Revit</li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3>🤖 IA Aplicada</h3>
+                    <ul>
+                        <li><strong>Computer Vision:</strong> Análise de imagens do canteiro</li>
+                        <li><strong>NLP:</strong> Análise de especificações técnicas</li>
+                        <li><strong>Reinforcement Learning:</strong> Otimização de cronogramas</li>
+                        <li><strong>GANs:</strong> Geração de layouts otimizados</li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3>📊 Datasets</h3>
+                    <ul>
+                        <li><a href="https://www.icevirtuallibrary.com/page/ice-carbon-database" target="_blank">ICE Database (Carbono)</a></li>
+                        <li><a href="https://www.worldgbc.org/" target="_blank">World Green Building Council</a></li>
+                        <li><a href="https://github.com/topics/bim" target="_blank">Repositórios BIM no GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusão -->
+    <section class="conclusion">
+        <div class="container">
+            <h2>Conclusão</h2>
+            <p class="conclusion-text">Este tutorial demonstrou como Cientistas de Dados podem contribuir diretamente para a <strong>Meta 9.4</strong> da ODS através da análise de dados BIM. A capacidade de quantificar recursos, calcular impactos ambientais e prever desperdícios transforma BIM de um modelo 3D em uma ferramenta estratégica para a modernização sustentável da construção civil.</p>
+            
+            <div class="final-cta">
+                <h3>Aplique esse conhecimento!</h3>
+                <p>Os conceitos apresentados aqui são apenas o começo. A verdadeira inovação acontece quando você aplica essas técnicas em projetos reais, gerando valor mensurável para empresas e impacto positivo para o planeta.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Continue Explorando</h2>
+            <div class="cta-grid">
+                <a href="eficiencia.html" class="cta-card">
+                    <h3>⚡ Cases de Eficiência</h3>
+                    <p>Veja como esses conceitos são aplicados na prática</p>
+                </a>
+                <a href="sustentabilidade.html" class="cta-card">
+                    <h3>🌱 Cases de Sustentabilidade</h3>
+                    <p>Explore aplicações em análise de ciclo de vida</p>
+                </a>
+                <a href="index.html" class="cta-card">
+                    <h3>🏠 Voltar ao Início</h3>
+                    <p>Reveja a visão geral do projeto</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Construção 4.0</h4>
+                    <p>Hub de conhecimento sobre a interseção entre BIM, IA e ODS na construção civil.</p>
+                    <p class="footer-note">Projeto de Extensão - PIEX II</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navegação</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="ods94.html">ODS 9.4</a></li>
+                        <li><a href="eficiencia.html">Eficiência</a></li>
+                        <li><a href="sustentabilidade.html">Sustentabilidade</a></li>
+                        <li><a href="tutorial.html">Tutorial</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://sdgs.un.org/goals/goal9" target="_blank">ONU - ODS 9</a></li>
+                        <li><a href="https://www.ipea.gov.br/ods/ods9.html" target="_blank">IPEA - ODS 9</a></li>
+                        <li><a href="https://blenderbim.org/docs-python/" target="_blank">IfcOpenShell Docs</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Construção 4.0 | Desenvolvido como projeto acadêmico</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="script.js"></script>
+</body>
+</html>
+
